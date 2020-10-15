@@ -1,0 +1,31 @@
+---
+# tasks file for ansible-mysql-dump
+
+- name: "get current date and time string"
+  command: "date -u +%Y%m%d-%H%M%S%z"
+  register: "date_result"
+  failed_when: "date_result.stderr != ''"
+
+- set_fact:
+    backup_path: "{{ mysql_backup_basepath }}/{{ date_result.stdout }}"
+
+- debug:
+    msg: "Storing backups in {{ backup_path }}"
+
+- name: "create backup subfolder"
+  file:
+    path: "{{ backup_path }}"
+    state: "directory"
+
+- name: "get list of mysql databases"
+  command: "mysql -N -B -e 'show databases'"
+  register: "shell_dbs"
+
+- set_fact:
+    mysql_dbs: "{{ shell_dbs.stdout_lines | difference(excluded_mysql_dbs) }}"
+
+- name: "dump mysql databases"
+  shell: >
+    mysqldump --single-transaction --skip-lock-tables '{{ item }}' | 
+    gzip -c > '{{ backup_path }}/{{ item }}.sql.gz'
+  loop: "{{ mysql_dbs }}"

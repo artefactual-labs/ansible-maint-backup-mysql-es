@@ -1,0 +1,11 @@
+---
+# defaults file for ansible-mysql-dump
+
+mysql_dump_excluded_dbs:     # do not backup these databases
+  - "information_schema"
+  - "performance_schema"
+  - "sys"
+
+# base path to store db dumps
+mysql_dump_basepath: "/var/artefactual/mysql-backups"
+
