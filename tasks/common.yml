@@ -1,0 +1,5 @@
+---
+
+- name: "Set fact backup_path"
+  set_fact:
+    backup_path: "{{ maint_backup_basepath }}/current"

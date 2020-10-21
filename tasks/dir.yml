@@ -1,0 +1,24 @@
+---
+
+- name: "get current date and time string"
+  command: "date -u +%Y%m%d-%H%M%S%z"
+  register: "date_result"
+  failed_when: "date_result.stderr != ''"
+
+- name: "check if backup_path already exists"
+  stat:
+    path: "{{ backup_path }}"
+  register: stat_backup_path
+
+- name: "Rename previous backup_path if already exists"
+  command: "mv -v {{ backup_path }} {{ maint_backup_basepath }}/olderthan-{{ date_result.stdout }}"
+
+- name: "Create backup_path"
+  file:
+    path: "{{ backup_path }}"
+    state: "directory"
+
+- name: "Add txt file with date of backup"
+  copy:
+    content: "{{ date_result.stdout }}"
+    dest: "{{ backup_path }}/backup-date.txt"

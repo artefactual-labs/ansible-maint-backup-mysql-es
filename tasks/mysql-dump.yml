@@ -1,0 +1,15 @@
+---
+
+
+- name: "get list of mysql databases"
+  command: "mysql -N -B -e 'show databases'"
+  register: "shell_dbs"
+
+- set_fact:
+    mysql_dbs: "{{ shell_dbs.stdout_lines | difference(maint_mysql_dump_excluded_dbs) }}"
+
+- name: "dump mysql databases"
+  shell: >
+    mysqldump --single-transaction --skip-lock-tables '{{ item }}' | 
+    gzip -c > '{{ backup_path }}/{{ item }}.sql.gz'
+  loop: "{{ mysql_dbs }}"

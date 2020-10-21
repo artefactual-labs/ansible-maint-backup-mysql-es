@@ -1,11 +1,32 @@
 ---
-# defaults file for ansible-mysql-dump
+# defaults file for ansible-maint-bakcups
 
-mysql_dump_excluded_dbs:     # do not backup these databases
+# default action is to backup, it can also set to restore
+maint_action: "backup"
+
+# base path to store backups dumps
+maint_backup_basepath: "/var/artefactual/maint-backups"
+
+###########################################
+
+maint_mysql_dump_excluded_dbs:     # do not backup these databases
   - "information_schema"
   - "performance_schema"
   - "sys"
 
-# base path to store db dumps
-mysql_dump_basepath: "/var/artefactual/mysql-backups"
+
+#############################################
+# Elasticsearch snapshot related parameters
+
+# ES server IP
+# Note: currently this only works if same as target host!!
+maint_es_server_ip: "127.0.0.1"
+# ES server port
+maint_es_server_port: "9200"
+# ES repository path (in the filesystem of the ES server)
+maint_es_repo_path: "/var/lib/elasticsearch/backup-repo"
+# ES repository name
+maint_es_repo_name: "backup-repo"
+# snapshot name to use
+maint_es_snapshot_name: "snapshot_1"
 

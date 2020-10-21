@@ -1,0 +1,5 @@
+---
+- name: "create tarball of the ES repo"
+  command: "tar -zcf {{ backup_path }}/es-repo.tgz ."
+  args:
+    chdir: "{{ maint_es_repo_path }}"

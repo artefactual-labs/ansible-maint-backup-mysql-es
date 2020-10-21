@@ -1,31 +1,35 @@
 ---
-# tasks file for ansible-mysql-dump
+# tasks file
 
-- name: "get current date and time string"
-  command: "date -u +%Y%m%d-%H%M%S%z"
-  register: "date_result"
-  failed_when: "date_result.stderr != ''"
+# tasks to run when maint_action is "backup" (default)
+- name: "maint_action backup tasks"
+  block:
+    - name: "common tasks"
+      import_tasks: "common.yml"
+      tags:
+        - maint-dir
+        - maint-mysql
+        - maint-es
 
-- set_fact:
-    backup_path: "{{ mysql_backup_basepath }}/{{ date_result.stdout }}"
+    - name: "Backup directory creation"
+      import_tasks: "dir.yml"
+      tags: "maint-dir"
 
-- debug:
-    msg: "Storing backups in {{ backup_path }}"
+    - name: "mysql dump tasks"
+      import_tasks: "mysql-dump.yml"
+      tags: "maint-mysql"
 
-- name: "create backup subfolder"
-  file:
-    path: "{{ backup_path }}"
-    state: "directory"
+    - name: "ES config repository tasks"
+      import_tasks: "es-config-repo.yml"
+      tags: "maint-es"
 
-- name: "get list of mysql databases"
-  command: "mysql -N -B -e 'show databases'"
-  register: "shell_dbs"
+    - name: "ES snapshot taking tasks"
+      import_tasks: "es-take-snapshot.yml"
+      tags: "maint-es"
 
-- set_fact:
-    mysql_dbs: "{{ shell_dbs.stdout_lines | difference(excluded_mysql_dbs) }}"
+    - name: "ES repository to tarball"
+      import_tasks: "es-backup-repo.yml"
+      tags: "maint-es"
+  when: maint_action == "backup"
 
-- name: "dump mysql databases"
-  shell: >
-    mysqldump --single-transaction --skip-lock-tables '{{ item }}' | 
-    gzip -c > '{{ backup_path }}/{{ item }}.sql.gz'
-  loop: "{{ mysql_dbs }}"
+
