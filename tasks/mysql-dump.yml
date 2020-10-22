@@ -1,5 +1,9 @@
 ---
 
+- name: "Create directory for mysql backups inside backup_path"
+  file:
+    path: "{{ backup_path }}/mysql"
+    state: "directory"
 
 - name: "get list of mysql databases"
   command: "mysql -N -B -e 'show databases'"
@@ -11,5 +15,5 @@
 - name: "dump mysql databases"
   shell: >
     mysqldump --single-transaction --skip-lock-tables '{{ item }}' | 
-    gzip -c > '{{ backup_path }}/{{ item }}.sql.gz'
+    gzip -c > '{{ backup_path }}/mysql/{{ item }}.sql.gz'
   loop: "{{ mysql_dbs }}"

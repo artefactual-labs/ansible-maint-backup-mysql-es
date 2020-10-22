@@ -1,15 +1,24 @@
 ---
 
+- name: "Delete snapshot from repo (if already existing)"
+  uri:
+    url: "http://{{ maint_es_server_ip }}:{{ maint_es_server_port }}/_snapshot/{{ maint_es_repo_name }}/{{ maint_es_snapshot_name }}"
+    method: "DELETE"
+    status_code:  # API returns 404 in case snapshot does not exist 
+      - 200
+      - 404
+
 - name: "Take snapshot of all indices"
   uri:
     url: "http://{{ maint_es_server_ip }}:{{ maint_es_server_port }}/_snapshot/{{ maint_es_repo_name }}/{{ maint_es_snapshot_name }}?wait_for_completion=true"
     method: "PUT"
     timeout: 600
 
-- name: "Get snapshot info and save to file"
+- name: "Get repo snapshot info and save to file"
   get_url:
-    url: "http://{{ maint_es_server_ip }}:{{ maint_es_server_port }}/_snapshot/{{ maint_es_repo_name }}/{{ maint_es_snapshot_name }}?wait_for_completion=true"
+    url: "http://{{ maint_es_server_ip }}:{{ maint_es_server_port }}/_snapshot/{{ maint_es_repo_name }}/_all?pretty"
     dest: "{{ backup_path }}/es-snapshot-info.txt"
+
 
 
 

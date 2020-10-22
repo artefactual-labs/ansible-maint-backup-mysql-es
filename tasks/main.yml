@@ -1,35 +1,32 @@
 ---
 # tasks file
 
-# tasks to run when maint_action is "backup" (default)
-- name: "maint_action backup tasks"
-  block:
-    - name: "common tasks"
-      import_tasks: "common.yml"
-      tags:
-        - maint-dir
-        - maint-mysql
-        - maint-es
+- name: "common tasks"
+  import_tasks: "common.yml"
+  tags:
+    - maint-dir
+    - maint-mysql
+    - maint-es
 
-    - name: "Backup directory creation"
-      import_tasks: "dir.yml"
-      tags: "maint-dir"
+- name: "Backup directory creation"
+  import_tasks: "dir.yml"
+  tags: maint-dir
 
-    - name: "mysql dump tasks"
-      import_tasks: "mysql-dump.yml"
-      tags: "maint-mysql"
+- name: "mysql dump tasks"
+  import_tasks: "mysql-dump.yml"
+  tags: maint-mysql
 
-    - name: "ES config repository tasks"
-      import_tasks: "es-config-repo.yml"
-      tags: "maint-es"
+- name: "ES config repository tasks"
+  import_tasks: "es-config-repo.yml"
+  tags: maint-es
 
-    - name: "ES snapshot taking tasks"
-      import_tasks: "es-take-snapshot.yml"
-      tags: "maint-es"
+- name: "ES snapshot taking tasks"
+  import_tasks: "es-take-snapshot.yml"
+  tags: maint-es
 
-    - name: "ES repository to tarball"
-      import_tasks: "es-backup-repo.yml"
-      tags: "maint-es"
-  when: maint_action == "backup"
+- name: "ES repository to tarball"
+  import_tasks: "es-backup-repo.yml"
+  tags: maint-es
+
 
 

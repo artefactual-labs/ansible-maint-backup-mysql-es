@@ -10,15 +10,18 @@
     path: "{{ backup_path }}"
   register: stat_backup_path
 
-- name: "Rename previous backup_path if already exists"
+- name: "Rename previous backup_path (if exists)"
   command: "mv -v {{ backup_path }} {{ maint_backup_basepath }}/olderthan-{{ date_result.stdout }}"
+  when: stat_backup_path.stat.exists
 
 - name: "Create backup_path"
   file:
     path: "{{ backup_path }}"
     state: "directory"
 
-- name: "Add txt file with date of backup"
+- name: "Add txt file with backup info"
   copy:
-    content: "{{ date_result.stdout }}"
-    dest: "{{ backup_path }}/backup-date.txt"
+    content: |
+      inventory_hostname: {{ inventory_hostname }} 
+      date: {{ date_result.stdout }}
+    dest: "{{ backup_path }}/backup-info.txt"
